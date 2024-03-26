@@ -60,9 +60,6 @@ class MainWindow(QMainWindow):
         self.read_param_button_action = QAction(QIcon('data//param.png'), "Задать параметры", self)
         self.read_param_button_action.triggered.connect(self.read_param_button_was_clicked)
 
-        # 2 Кнопка Задать начальную температуру 
-        self.read_temp_start_button_action = QAction(QIcon('data//t0.png'), "Задать t0", self)
-        self.read_temp_start_button_action.triggered.connect(self.read_temp_start_button_was_clicked)
 
         # 2 Кнопка Задать геометрию
         self.read_geom_button_action = QAction(QIcon('data//geom.png'), "Задать геометрию", self)
@@ -80,6 +77,16 @@ class MainWindow(QMainWindow):
         self.anim2_button_action.setEnabled(False)
 
 
+        # 2 Кнопка Начальная температура как решение системы ОДУ
+        self.temp_start_button_action = QAction(QIcon("data//t0.png"), "Задать t0 по умолчанию", self)
+        self.temp_start_button_action.triggered.connect(self.temp_start_button_was_clicked)
+
+
+        # 2 Кнопка Задать начальную температуру из файла
+        self.read_temp_start_button_action = QAction(QIcon('data//t0.png'), "Задать t0 из файла", self)
+        self.read_temp_start_button_action.triggered.connect(self.read_temp_start_button_was_clicked)
+
+
 
 
         # Создани меню
@@ -87,12 +94,14 @@ class MainWindow(QMainWindow):
         file_menu = menu.addMenu("Меню")
 
         file_submenu = file_menu.addMenu("Параметры")
-
         file_submenu.addAction(self.read_param_button_action)
         file_submenu.addSeparator()
-        file_submenu.addAction(self.read_temp_start_button_action)
-        file_submenu.addSeparator()
         file_submenu.addAction(self.read_geom_button_action)
+
+        file_sub_submenu = file_submenu.addMenu("Задать t0")
+        file_sub_submenu.addAction(self.read_temp_start_button_action)
+        file_sub_submenu.addSeparator()
+        file_sub_submenu.addAction(self.temp_start_button_action)
 
 
         file_menu.addAction(self.start_button_action)
@@ -157,14 +166,14 @@ class MainWindow(QMainWindow):
         
         if filename != None:
             self.geom_filename = filename
-            self.geom_filename_widget.setText("Геометрия: " + self.geom_filename)
+            self.mesh = Mesh_Triangle(self.geom_filename)
             if self.param_filename != '':
-                self.start_button_action.setEnabled(True)
-            
+                self.start_button_action.setEnabled(True)    
+            self.geom_filename_widget.setText("Геометрия: " + self.geom_filename)     
         else:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("Warning")
-            dlg.setText("Error in filename")
+            dlg.setText("Error in geom filename! Choose again")
             dlg.exec()
         return
 
@@ -185,7 +194,7 @@ class MainWindow(QMainWindow):
         else:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("Warning")
-            dlg.setText("Error in filename")
+            dlg.setText("Error in param filename! Choose again")
             dlg.exec()
         return
         
@@ -193,8 +202,17 @@ class MainWindow(QMainWindow):
 
 
 
+    def temp_start_button_was_clicked(self, checked) -> None:
+        print('Нажали кнопку Задать начальную температуру по умолчанию!')
+        self.start_temp_filename = ''
+        self.start_temp_filename_widget.setText("Нач. температура: по умолчанию")
+        if (self.param_filename != '' and self.geom_filename != ''):
+                self.start_button_action.setEnabled(True)
+        return
+
+
     def read_temp_start_button_was_clicked(self, checked) -> None:
-        print('Нажали кнопку Задать начальную температуру!')
+        print('Нажали кнопку Задать начальную температуру из файла!')
         # Выбор файла с нач. температурой
         filename = self.get_choosen_filename(message="начальная температура", name_filter="*.csv")
         
@@ -206,7 +224,7 @@ class MainWindow(QMainWindow):
         else:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("Warning")
-            dlg.setText("Error in filename")
+            dlg.setText("Error in start temp filename! Choose again")
             dlg.exec()
         return
 
@@ -218,21 +236,14 @@ class MainWindow(QMainWindow):
         if self.geom_filename != '' and self.param_filename != '':
             start_time = time.time()
             #Заполнение данных
-            self.mesh = None
-            self.mesh = Mesh_Triangle(self.geom_filename)
-            self.param = None
             self.param = Param(self.param_filename, self.mesh.num_elmnt, self.start_temp_filename)
 
-            if (self.param.T != -1): #отрезок времени
+            solver = Ode_Solver(mesh=self.mesh, param=self.param)
+            if (self.start_temp_filename == ''):
+                self.param.start_temp = solver.ode_calculate_temp_stationar(self.param)
+            print("Начальная температура: ", self.param.start_temp)
 
-                solver = Ode_Solver(mesh=self.mesh, param=self.param)
-                if (self.start_temp_filename == ''):
-                    self.param.start_temp = solver.ode_calculate_temp_stationar(self.param)
-
-                self.ode_sol = solver.ode_calculate_temp(self.param)
-            else: #время не ограничено
-                pass
- 
+            self.ode_sol = solver.ode_calculate_temp(self.param)
             self.anim1_button_action.setEnabled(True)
             self.anim2_button_action.setEnabled(True)
             self.save_button_action.setEnabled(True)
@@ -264,7 +275,7 @@ class MainWindow(QMainWindow):
         else:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("Warning")
-            dlg.setText("Error in filename")
+            dlg.setText("Error in save filename")
             dlg.exec()
         return
 

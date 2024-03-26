@@ -29,7 +29,7 @@ class Ode_Solver:
         self.mult_QE_vec = np.zeros(mesh.num_elmnt, dtype=float)
         for i in range(mesh.num_elmnt):
             for j in range(mesh.num_elmnt):
-                self.matrix_kij[i][j] = - mesh.Sij[i][j] * param.lambda_ij[i][j]
+                self.matrix_kij[i][j] =  mesh.Sij[i][j] * param.lambda_ij[i][j]
             self.mult_QE_vec[i] = -5.67 * param.eps[i] * mesh.Si[i] / (100.**4)
 
         self.ci = param.c_coef
@@ -71,6 +71,6 @@ class Ode_Solver:
     
 
     def ode_calculate_temp_stationar(self, param: Param) -> np.ndarray:
-        t0 = np.zeros(param.num_elmnts, dtype=float)
+        t0 = np.ones(param.num_elmnts, dtype=float) 
         system_sol_stationar = fsolve(self.get_right_side_stationar, t0)
         return system_sol_stationar

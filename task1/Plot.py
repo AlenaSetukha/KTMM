@@ -10,7 +10,7 @@ def one_plot_solution(ode_sol: np.ndarray, time_grid:np.ndarray) -> None:
 
     legend_str = []
     for i in range(ode_sol.shape[1]):
-        plt.plot(time_grid, ode_sol[:, i])  # построение графика
+        plt.plot(time_grid[:], ode_sol[:, i])  # построение графика
         legend_str.append("T[" + str(i + 1) + "](t)")
     plt.legend(legend_str)
     plt.show()
@@ -27,6 +27,7 @@ def many_plot_solution(ode_sol: np.ndarray, time_grid:np.ndarray) -> None:
     # Построение графиков
     for i in range(num_elmnt):
         plt.subplot(3, 3, i + 1)
+        #plt.subplot(num_elmnt, 1, i + 1)
         plt.plot(time_grid, ode_sol[:, i])    # построение графика
         plt.xlabel("t")         # ось абсцисс
         plt.title("T[" + str(i + 1) + "](t)") # ось ординат

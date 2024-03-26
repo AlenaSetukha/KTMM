@@ -10,7 +10,7 @@ class Param:
         if self.T != -1:
             self.time_grid = np.linspace(0, self.T, self.N_t)
         else:
-            self.time_grid = np.linspace(0, 1000000, 10000)
+            self.time_grid = np.linspace(0, 1000000, 100000)
 
         self.start_temp = self.get_start_temp(filename_temp)
 
@@ -29,7 +29,7 @@ class Param:
             file_reader = csv.reader(csvfile, delimiter=',', quotechar='|')
             num_tmp = 0
             # Значения по умолчанию
-            time_intrvl = -1
+            time_intrvl = -1       #Если -1, то бесконенчое время расчета
             N_t = 200
 
             for row in file_reader:
@@ -46,6 +46,8 @@ class Param:
                 if num_tmp == 2 + self.num_elmnts:
                     time_intrvl_tmp = np.array([word for word in row], dtype=float)
                     time_intrvl = time_intrvl_tmp[0]
+                    if time_intrvl == -1:
+                        break
                 #Считывание кличества шагов по времени    
                 if num_tmp == 3 + self.num_elmnts:
                     N_t_tmp = np.array([word for word in row], dtype=int)
