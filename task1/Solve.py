@@ -71,6 +71,6 @@ class Ode_Solver:
     
 
     def ode_calculate_temp_stationar(self, param: Param) -> np.ndarray:
-        t0 = np.ones(param.num_elmnts, dtype=float) 
+        t0 = np.ones(param.num_elmnts, dtype=float)
         system_sol_stationar = fsolve(self.get_right_side_stationar, t0)
         return system_sol_stationar
