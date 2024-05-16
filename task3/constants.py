@@ -42,7 +42,7 @@ options = (('Sun', '#F5CC45', 4),
           ('Venus', 'orange', 0.3),
           ('Earth', 'green', 0.3),
           ('Mars', 'red', 0.2),
-          ('Jupiter', '#DC7236', 2),
+          ('Jupiter', '#DC7236', 0.2),
           ('Saturn', '#DBA25F', 2),
           ('Uranus', '#18C8DB', 1.1),
           ('Neptune', '#2888DB', 1.1))
