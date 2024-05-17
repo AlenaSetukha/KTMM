@@ -66,7 +66,7 @@ def solver3(mass: ndarray, rv_start: ndarray, t: ndarray) -> ndarray:
 
     dt = ((t[0] + t[-1]) / t.shape[0]).astype(np.float64)
 
-    p = mp.Pool(6) # параллелим тела
+    p = mp.Pool(mp.cpu_count()) # параллелим тела
 
 
     # a(n) = dv(n)/dt
