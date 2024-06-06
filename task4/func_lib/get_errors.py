@@ -1,7 +1,8 @@
 import fenics
 import numpy as np
 
-def get_errors(u_exact: fenics.Expression, num_sol: fenics.Expression, mesh: fenics.Mesh):
+#def get_errors(u_exact: fenics.Expression, num_sol: fenics.Function, mesh: fenics.Mesh):
+def get_errors(u_exact: fenics.Expression, num_sol: fenics.Function, mesh: fenics.Mesh):
     # L2 
     error_L2 = fenics.errornorm(u_exact, num_sol, 'L2')
     # MAX 
